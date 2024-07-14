@@ -1,0 +1,1 @@
+import{u as r,j as t}from"./components-XXrZDpAO.js";import{g as s}from"./get-yoast-meta-BJwIJVCd.js";const i={},c=({data:e})=>e?s(e.page):[],a=()=>{const{page:e}=r();return t.jsx("div",{children:t.jsx("h1",{children:e.title.rendered})})},d=a;export{d as default,i as handle,c as meta};
