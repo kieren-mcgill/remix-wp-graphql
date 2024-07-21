@@ -1,4 +1,4 @@
-import WordPressPost from "../../types/wordpress-post.interface";
+import WordPressPost from "../../types/wordpress.interface";
 import getYoastBreadcrumb from "~/lib/get-yoast-breadcrumb";
 import FetchPostResult from "~/types/fetch-post-result.interface";
 

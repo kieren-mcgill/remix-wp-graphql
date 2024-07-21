@@ -9,7 +9,7 @@ import "./styles/tailwind.css";
 import React from "react";
 import Header from "~/components/Header";
 import Footer from "~/components/Footer";
-import Breadcrumb from "~/components/Breadcrumb";
+// import Breadcrumb from "~/components/Breadcrumb";
 
 // export async function loader() {
 //
@@ -28,7 +28,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <body className={"flex flex-col min-h-screen"}>
 
       <Header/>
-      <Breadcrumb/>
+      {/*<Breadcrumb/>*/}
 
       <main className={"flex-grow"}>
 

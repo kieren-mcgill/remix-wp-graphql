@@ -1,39 +1,40 @@
 import {MetaFunction, useLoaderData} from "@remix-run/react";
-import { fetchPage } from "~/lib/api/fetch-page";
-import WordPressPost from "~/types/wordpress-post.interface";
+import {Params} from "~/types/remix.interface";
 import getYoastMeta from "~/lib/get-yoast-meta";
+import {WordPressPage} from "~/types/wordpress.interface";
+import fetchPage from "~/lib/data/fetch-page";
+import process from "process";
 
-export async function loader() {
-    const slug = 'home';
+export async function loader({ params }: { params: Params }) {
 
-    const { page, breadcrumbs } = await fetchPage(slug);
+    const homePageSlug = process.env.HOMEPAGE_SLUG
 
-    if (!page) {
-        throw new Response('Homepage not found', { status: 404 });
+    try {
+        return await fetchPage({ params: { ...params, slug: homePageSlug }});
+    } catch (error) {
+        console.error('Error in loader:', error);
+        throw error;
     }
-
-    return { page, breadcrumbs };
 }
+
+export const handle = {};
 
 export const meta: MetaFunction = ({data}) => {
     if (!data) {
         return [];
     }
-
     return getYoastMeta(data.page);
 };
 
-
-
-const HomePage = () => {
-    const {page}: { page: WordPressPost } = useLoaderData();
+const Page = () => {
+    const page = useLoaderData<WordPressPage>();
 
     return (
         <div>
-            <h1 className={"text-red-700"}>{page.title.rendered}</h1>
+            <h1>{page.title}</h1>
         </div>
     );
-};
+}
 
-export default HomePage;
+export default Page;
 

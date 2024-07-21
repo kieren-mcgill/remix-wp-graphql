@@ -1,5 +1,5 @@
-import WordPressPost from "~/types/wordpress-post.interface";
-import YoastHeadJson from "~/types/yoast-head-json.interface";
+import WordPressPost from "~/types/wordpress.interface";
+import YoastHeadJson from "~/types/yoast.interface";
 
 const getYoastMeta = (page: WordPressPost | null) => {
 

@@ -1,7 +1,7 @@
 import { useLoaderData } from "@remix-run/react";
-import WordPressPost from "../../types/wordpress-post.interface";
-import Params from "~/types/params.interface";
-import { fetchPost } from "~/lib/api/fetch-post";
+import WordPressPost from "../../types/wordpress.interface";
+import Params from "~/types/remix.interface";
+import { fetchPost } from "~/lib/data/fetch-post";
 
 export async function loader({ params }: { params: Params }) {
 

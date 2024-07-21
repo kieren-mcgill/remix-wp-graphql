@@ -1,4 +1,4 @@
-import WordPressPost from "~/types/wordpress-post.interface";
+import WordPressPost from "~/types/wordpress.interface";
 import BreadcrumbItem from "~/types/breadcrumb-item.interface";
 
 const getYoastBreadcrumb = (data: WordPressPost | null) => {
