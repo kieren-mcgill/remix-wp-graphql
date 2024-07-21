@@ -5,8 +5,8 @@ import { RemixServer, NavLink, useMatches, Outlet, Meta, Links, ScrollRestoratio
 import { isbot } from "isbot";
 import { renderToPipeableStream } from "react-dom/server";
 import { GraphQLClient } from "graphql-request";
-import process$2 from "process";
-import * as process$1 from "node:process";
+import process$1 from "process";
+import * as process from "node:process";
 const ABORT_DELAY = 5e3;
 function handleRequest(request, responseStatusCode, responseHeaders, remixContext, loadContext) {
   return isbot(request.headers.get("user-agent") || "") ? handleBotRequest(
@@ -167,44 +167,44 @@ const route0 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProper
   Layout,
   default: App
 }, Symbol.toStringTag, { value: "Module" }));
-const getYoastMeta = (page) => {
-  const metaData = page && page.yoast_head_json;
+const createMeta = (seoData) => {
   return [
-    { title: (metaData == null ? void 0 : metaData.title) || "Site Title" },
-    { name: "description", content: (metaData == null ? void 0 : metaData.description) || "" },
-    { name: "robots", content: (metaData == null ? void 0 : metaData.robots) || "index, follow" },
-    { rel: "canonical", href: (metaData == null ? void 0 : metaData.canonical) || "" },
-    { property: "og:title", content: (metaData == null ? void 0 : metaData.og_title) || (metaData == null ? void 0 : metaData.title) || "Site Title" },
-    { property: "og:description", content: (metaData == null ? void 0 : metaData.og_description) || (metaData == null ? void 0 : metaData.description) || "" },
-    { property: "og:image", content: (metaData == null ? void 0 : metaData.og_image) || "" },
-    { property: "og:url", content: (metaData == null ? void 0 : metaData.canonical) || "" },
-    { name: "twitter:card", content: (metaData == null ? void 0 : metaData.twitter_card) || "summary" },
-    { name: "twitter:title", content: (metaData == null ? void 0 : metaData.twitter_title) || (metaData == null ? void 0 : metaData.title) || "Site Title" },
-    { name: "twitter:description", content: (metaData == null ? void 0 : metaData.twitter_description) || (metaData == null ? void 0 : metaData.description) || "" },
-    { name: "twitter:image", content: (metaData == null ? void 0 : metaData.twitter_image) || "" },
-    { name: "keywords", content: (metaData == null ? void 0 : metaData.keywords) || "" }
+    { title: (seoData == null ? void 0 : seoData.title) || "Site Title" },
+    { name: "description", content: (seoData == null ? void 0 : seoData.description) || "" },
+    { name: "twitter:title", content: (seoData == null ? void 0 : seoData.twitter_title) || (seoData == null ? void 0 : seoData.title) || "Site Title" },
+    { name: "twitter:description", content: (seoData == null ? void 0 : seoData.twitter_description) || (seoData == null ? void 0 : seoData.description) || "" }
   ];
 };
-const baseURL = process$2.env.WORDPRESS_API_URL;
+const baseURL = process$1.env.WORDPRESS_API_URL;
 const endpoint = `${baseURL}/graphql`;
 const client = new GraphQLClient(endpoint, {});
+const SEO_FRAGMENT = `
+  fragment SeoFragment on PostTypeSEO {
+    breadcrumbs {
+      url
+      text
+    }
+    title
+    metaDesc
+    twitterTitle
+    twitterDescription
+  }
+`;
 const GET_PAGE = `
   query GetPage($id: ID!) {
     page(id: $id, idType: URI) {
-        title
-        link
+      title
+      link
       seo {
-        breadcrumbs {
-          url
-          text
-        }
+        ...SeoFragment
       }
     }
   }
+  ${SEO_FRAGMENT}
 `;
 const fetchPage = async ({ params }) => {
   const { grandParentSlug, parentSlug, slug } = params;
-  const homePageSlug = process$2.env.HOMEPAGE_SLUG;
+  const homePageSlug = process$1.env.HOMEPAGE_SLUG;
   try {
     const data = await client.request(GET_PAGE, { id: slug });
     const page = data.page;
@@ -233,7 +233,7 @@ const fetchPage = async ({ params }) => {
     throw new Response("Failed to load data", { status: 500 });
   }
 };
-const loader$3 = async ({ params }) => {
+const loader$2 = async ({ params }) => {
   try {
     return await fetchPage({ params });
   } catch (error) {
@@ -245,7 +245,7 @@ const meta = ({ data }) => {
   if (!data) {
     return [];
   }
-  return getYoastMeta(data.page);
+  return createMeta(data.seo);
 };
 const WordPressPageTemplate = () => {
   const page = useLoaderData();
@@ -255,24 +255,24 @@ const GrandParentSlugParentSlugSlugPage = () => /* @__PURE__ */ jsx(WordPressPag
 const route1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   default: GrandParentSlugParentSlugSlugPage,
-  loader: loader$3,
+  loader: loader$2,
   meta
 }, Symbol.toStringTag, { value: "Module" }));
 const ParentSlugSlugPage = () => /* @__PURE__ */ jsx(WordPressPageTemplate, {});
 const route2 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   default: ParentSlugSlugPage,
-  loader: loader$3,
+  loader: loader$2,
   meta
 }, Symbol.toStringTag, { value: "Module" }));
-const loader$2 = () => {
-  const baseUrl2 = process$1.env.WORDPRESS_API_URL;
+const loader$1 = () => {
+  const baseUrl = process.env.WORDPRESS_API_URL;
   const robotText = `
         User-agent: Googlebot
         Disallow: /nogooglebot/
         User-agent: *
         Allow: /
-        Sitemap: ${baseUrl2}/sitemap_index.xml`;
+        Sitemap: ${baseUrl}/sitemap_index.xml`;
   return new Response(robotText, {
     status: 200,
     headers: {
@@ -282,54 +282,13 @@ const loader$2 = () => {
 };
 const route3 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  loader: loader$2
-}, Symbol.toStringTag, { value: "Module" }));
-const getYoastBreadcrumb = (data) => {
-  if (!data) {
-    console.error("Could not find yoast breadcrumb data");
-    return null;
-  }
-  const yoastBreadcrumbArray = data.yoast_head_json.schema["@graph"];
-  const yoastBreadcrumbObject = yoastBreadcrumbArray.find((item) => item["@type"] === "BreadcrumbList");
-  if (yoastBreadcrumbObject) {
-    return yoastBreadcrumbObject.itemListElement;
-  } else {
-    console.error("Could not find yoast breadcrumb data");
-    return null;
-  }
-};
-const baseUrl = process.env.WORDPRESS_API_URL;
-async function fetchPost(slug) {
-  const response = await fetch(`${baseUrl}/wp-json/wp/v2/posts?slug=${slug}`);
-  if (!response.ok) {
-    throw new Error(`Failed to fetch page with slug: ${slug}`);
-  }
-  const posts = await response.json();
-  const post = posts.length > 0 ? posts[0] : null;
-  const breadcrumbs = getYoastBreadcrumb(post);
-  return { post, breadcrumbs };
-}
-async function loader$1({ params }) {
-  const { slug } = params;
-  const { post, breadcrumbs } = await fetchPost(slug);
-  if (!post) {
-    throw new Response("Post not found", { status: 404 });
-  }
-  return { post, breadcrumbs };
-}
-const handle$1 = {};
-const Post = () => {
-  const { post } = useLoaderData();
-  return /* @__PURE__ */ jsx("div", { children: /* @__PURE__ */ jsx("h1", { children: post.title.rendered }) });
-};
-const route4 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
-  __proto__: null,
-  default: Post,
-  handle: handle$1,
   loader: loader$1
 }, Symbol.toStringTag, { value: "Module" }));
+const route4 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null
+}, Symbol.toStringTag, { value: "Module" }));
 async function loader({ params }) {
-  const homePageSlug = process$2.env.HOMEPAGE_SLUG;
+  const homePageSlug = process$1.env.HOMEPAGE_SLUG;
   try {
     return await fetchPage({ params: { ...params, slug: homePageSlug } });
   } catch (error) {
@@ -350,10 +309,10 @@ const SlugPage = () => /* @__PURE__ */ jsx(WordPressPageTemplate, {});
 const route6 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   default: SlugPage,
-  loader: loader$3,
+  loader: loader$2,
   meta
 }, Symbol.toStringTag, { value: "Module" }));
-const serverManifest = { "entry": { "module": "/assets/entry.client-BU8uL3S5.js", "imports": ["/assets/components-XXrZDpAO.js"], "css": [] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/root-CkasfP1E.js", "imports": ["/assets/components-XXrZDpAO.js"], "css": ["/assets/root-CeYH0zgx.css"] }, "routes/$grandParentSlug.$parentSlug.$slug": { "id": "routes/$grandParentSlug.$parentSlug.$slug", "parentId": "root", "path": ":grandParentSlug/:parentSlug/:slug", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/route-CDQyL6AC.js", "imports": ["/assets/components-XXrZDpAO.js", "/assets/WordPressPageTemplate-CqhGtkS3.js"], "css": [] }, "routes/$parentSlug.$slug": { "id": "routes/$parentSlug.$slug", "parentId": "root", "path": ":parentSlug/:slug", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/route-X15dIa9g.js", "imports": ["/assets/components-XXrZDpAO.js", "/assets/WordPressPageTemplate-CqhGtkS3.js"], "css": [] }, "routes/[robots.txt]": { "id": "routes/[robots.txt]", "parentId": "root", "path": "robots.txt", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/_robots.txt_-l0sNRNKZ.js", "imports": [], "css": [] }, "routes/post.$slug": { "id": "routes/post.$slug", "parentId": "root", "path": "post/:slug", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/route-WR7gjZ_a.js", "imports": ["/assets/components-XXrZDpAO.js"], "css": [] }, "routes/_index": { "id": "routes/_index", "parentId": "root", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/_index-CUgNkPpe.js", "imports": ["/assets/components-XXrZDpAO.js", "/assets/WordPressPageTemplate-CqhGtkS3.js"], "css": [] }, "routes/$slug": { "id": "routes/$slug", "parentId": "root", "path": ":slug", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/route-BR2_Zci_.js", "imports": ["/assets/components-XXrZDpAO.js", "/assets/WordPressPageTemplate-CqhGtkS3.js"], "css": [] } }, "url": "/assets/manifest-e25a290a.js", "version": "e25a290a" };
+const serverManifest = { "entry": { "module": "/assets/entry.client-43Y8tM5Z.js", "imports": ["/assets/components-C_kpxqgJ.js"], "css": [] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/root-CzfkUbjf.js", "imports": ["/assets/components-C_kpxqgJ.js"], "css": ["/assets/root-CeYH0zgx.css"] }, "routes/$grandParentSlug.$parentSlug.$slug": { "id": "routes/$grandParentSlug.$parentSlug.$slug", "parentId": "root", "path": ":grandParentSlug/:parentSlug/:slug", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/route-syS7MhZf.js", "imports": ["/assets/components-C_kpxqgJ.js", "/assets/WordPressPageTemplate-Bo9fKNpD.js"], "css": [] }, "routes/$parentSlug.$slug": { "id": "routes/$parentSlug.$slug", "parentId": "root", "path": ":parentSlug/:slug", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/route-CB6xPDiB.js", "imports": ["/assets/components-C_kpxqgJ.js", "/assets/WordPressPageTemplate-Bo9fKNpD.js"], "css": [] }, "routes/[robots.txt]": { "id": "routes/[robots.txt]", "parentId": "root", "path": "robots.txt", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/_robots.txt_-l0sNRNKZ.js", "imports": [], "css": [] }, "routes/post.$slug": { "id": "routes/post.$slug", "parentId": "root", "path": "post/:slug", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/route-l0sNRNKZ.js", "imports": [], "css": [] }, "routes/_index": { "id": "routes/_index", "parentId": "root", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/_index-DiRGdxLY.js", "imports": ["/assets/components-C_kpxqgJ.js", "/assets/WordPressPageTemplate-Bo9fKNpD.js"], "css": [] }, "routes/$slug": { "id": "routes/$slug", "parentId": "root", "path": ":slug", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/route-Dtu9r43m.js", "imports": ["/assets/components-C_kpxqgJ.js", "/assets/WordPressPageTemplate-Bo9fKNpD.js"], "css": [] } }, "url": "/assets/manifest-0e37634e.js", "version": "0e37634e" };
 const mode = "production";
 const assetsBuildDirectory = "build/client";
 const basename = "/";

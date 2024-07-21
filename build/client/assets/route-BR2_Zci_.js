@@ -1,1 +1,0 @@
-import{j as e}from"./components-XXrZDpAO.js";import{W as o}from"./WordPressPageTemplate-CqhGtkS3.js";import{m as g}from"./WordPressPageTemplate-CqhGtkS3.js";const s=()=>e.jsx(o,{}),r=s;export{r as default,g as meta};
