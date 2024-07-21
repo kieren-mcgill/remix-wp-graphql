@@ -1,5 +1,4 @@
-import { loader, meta } from "~/components/WordPressPageTemplate";
-import WordPressPageTemplate from "~/components/WordPressPageTemplate";
+import WordPressPageTemplate, { loader, meta } from "~/components/WordPressPageTemplate";
 
 export { loader, meta };
 

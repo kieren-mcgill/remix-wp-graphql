@@ -1,5 +1,4 @@
 import {useMatches} from "@remix-run/react";
-import MatchData from "~/types/match-data.interface";
 import BreadcrumbLink from "~/components/BreadcrumbLink";
 
 const Breadcrumb = () => {
@@ -7,27 +6,26 @@ const Breadcrumb = () => {
     const matches = useMatches();
 
     const lastMatch = matches[matches.length - 1];
-    const breadcrumbs = (lastMatch.data as MatchData)?.breadcrumbs;
+    const breadcrumbs = lastMatch.data?.seo.breadcrumbs;
 
-    const showBreadcrumb = breadcrumbs ? breadcrumbs[1].name !== homepageName : false;
+    const showBreadcrumb = breadcrumbs ? breadcrumbs.length > 1 : false;
 
     return (
         <>
             {(breadcrumbs && showBreadcrumb) &&
             <nav className={"h-8 bg-amber-400"} aria-label="breadcrumb">
 
-
                     <ol className={"flex gap-3"}>
                         {breadcrumbs.map((breadcrumb, index: number) => {
 
-                                const itemURLObj = breadcrumb.item && new URL(breadcrumb.item)
+                                const itemURLObj = breadcrumb.url && new URL(breadcrumb.url)
                                 const relPath = itemURLObj ? itemURLObj.pathname : "#"
 
                                 return (
                                     <li key={index}>
                                         <BreadcrumbLink
                                             path={relPath}
-                                            name={breadcrumb.name}
+                                            name={breadcrumb.text}
                                             isLastItem={index === breadcrumbs.length - 1}
                                         />
                                     </li>

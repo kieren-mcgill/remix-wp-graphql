@@ -1,9 +1,7 @@
-import {MetaFunction, useLoaderData} from "@remix-run/react";
 import {Params} from "~/types/remix.interface";
-import getYoastMeta from "~/lib/get-yoast-meta";
-import {WordPressPage} from "~/types/wordpress.interface";
 import fetchPage from "~/lib/data/fetch-page";
 import process from "process";
+import WordPressPageTemplate, { meta } from "~/components/WordPressPageTemplate";
 
 export async function loader({ params }: { params: Params }) {
 
@@ -19,22 +17,9 @@ export async function loader({ params }: { params: Params }) {
 
 export const handle = {};
 
-export const meta: MetaFunction = ({data}) => {
-    if (!data) {
-        return [];
-    }
-    return getYoastMeta(data.page);
-};
+export { meta }
 
-const Page = () => {
-    const page = useLoaderData<WordPressPage>();
+const HomePage = () => <WordPressPageTemplate />;
 
-    return (
-        <div>
-            <h1>{page.title}</h1>
-        </div>
-    );
-}
-
-export default Page;
+export default HomePage;
 

@@ -1,5 +1,5 @@
 import { GraphQLClient } from 'graphql-request';
-import * as process from "process";
+import process from "process";
 
 const baseURL = process.env.WORDPRESS_API_URL
 
