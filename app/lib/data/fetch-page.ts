@@ -1,5 +1,5 @@
 import client from '~/lib/graphql-client';
-import { GET_PAGE } from '~/queries/page';
+import { GET_PAGE } from '~/queries/page-query';
 import { WordPressPage } from "~/types/wordpress.interface";
 import process from "process";
 

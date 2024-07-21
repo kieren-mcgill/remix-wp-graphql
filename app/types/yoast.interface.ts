@@ -1,17 +1,6 @@
-export default interface YoastHeadJson {
-    schema: {
-        '@graph': Array<{ [key: string]: never }>;
-    };
+export default interface SeoData {
     title: string;
-    description?: string;
-    robots?: string;
-    canonical?: string;
-    og_title?: string;
-    og_description?: string;
-    og_image?: string;
-    twitter_card?: string;
-    twitter_title?: string;
-    twitter_description?: string;
-    twitter_image?: string;
-    keywords?: string
+    description: string;
+    twitter_title: string;
+    twitter_description: string;
 }

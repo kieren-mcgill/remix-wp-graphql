@@ -10,6 +10,11 @@ export interface WordPressPage {
             url: string;
             text: string;
         }>;
+        title: string;
+        metaDesc: string;
+        twitterTitle: string;
+        twitterDescription: string;
+
     };
 }
 
@@ -26,9 +31,4 @@ export interface WordPressPost {
             text: string;
         }>;
     };
-}
-
-export interface BreadcrumbItem {
-    name: string;
-    item: string;
 }

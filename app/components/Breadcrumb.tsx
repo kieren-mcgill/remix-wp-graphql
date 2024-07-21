@@ -2,7 +2,6 @@ import {useMatches} from "@remix-run/react";
 import BreadcrumbLink from "~/components/BreadcrumbLink";
 
 const Breadcrumb = () => {
-    const homepageName = 'Home';
     const matches = useMatches();
 
     const lastMatch = matches[matches.length - 1];

@@ -1,5 +1,5 @@
 import { MetaFunction, useLoaderData } from "@remix-run/react";
-import getYoastMeta from "~/lib/get-yoast-meta";
+import createMeta from "~/lib/create-meta";
 import { WordPressPage } from "~/types/wordpress.interface";
 import fetchPage from "~/lib/data/fetch-page";
 import { Params } from "~/types/remix.interface";
@@ -17,7 +17,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
     if (!data) {
         return [];
     }
-    return getYoastMeta(data.page);
+    return createMeta(data.seo);
 };
 
 const WordPressPageTemplate = () => {

@@ -1,14 +1,14 @@
+import { SEO_FRAGMENT } from "~/queries/fragments";
+
 export const GET_PAGE = `
   query GetPage($id: ID!) {
     page(id: $id, idType: URI) {
-        title
-        link
+      title
+      link
       seo {
-        breadcrumbs {
-          url
-          text
-        }
+        ...SeoFragment
       }
     }
   }
+  ${SEO_FRAGMENT}
 `;
