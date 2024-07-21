@@ -1,1 +1,0 @@
-import{u as r,j as t}from"./components-XXrZDpAO.js";import{g as s}from"./get-yoast-meta-BJwIJVCd.js";const m=({data:e})=>e?s(e.page):[],a=()=>{const{page:e}=r();return t.jsx("div",{children:t.jsx("h1",{className:"text-red-700",children:e.title.rendered})})},i=a;export{i as default,m as meta};
