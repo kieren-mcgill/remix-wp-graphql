@@ -10,6 +10,7 @@ import React from "react";
 import Header from "~/components/Header";
 import Footer from "~/components/Footer";
 import Breadcrumb from "~/components/Breadcrumb";
+import ErrorBoundary from "~/components/ErrorBoundary";
 import getMenu from "~/lib/data/get-menu";
 import {WordPressMenu} from "~/types/wp-post-types.interface";
 import process from "process";
@@ -67,3 +68,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
 export default function App() {
   return <Outlet />;
 }
+
+export const ErrorBoundary = () => {
+    return <ErrorBoundary />;
+};
+
+
+
+
+
