@@ -6,14 +6,14 @@ import { Params } from "~/types/remix.interface";
 
 export const loader = async ({ params }: { params: Params }) => {
     try {
-        return await fetchPage({ params });
+        return await fetchPage<WordPressPage | null>({ params });
     } catch (error) {
         console.error('Error in loader:', error);
         throw error;
     }
 };
 
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
+export const meta: MetaFunction = ({ data }) => {
     if (!data) {
         return [];
     }
