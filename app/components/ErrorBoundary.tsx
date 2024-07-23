@@ -1,24 +1,22 @@
-import {isRouteErrorResponse, useRouteError} from "@remix-run/react";
+import {Links, Meta, Scripts} from "@remix-run/react";
+import React from "react";
 
-const ErrorBoundary = () => {
-    const error = useRouteError();
+const ErrorBoundaryComponent = ({error}) => {
 
-    if (isRouteErrorResponse(error)) {
         return (
-            <div className="error-container">
-                <h1>{error.status}</h1>
-                <p>{error.statusText}</p>
-                {error.data?.message && <p>{error.data.message}</p>}
-            </div>
-        );
-    }
+            <html>
+            <head>
+                <title>Oh no!</title>
+                <Meta />
+                <Links />
+            </head>
+            <body>
+            <h1>{error.status}</h1>
+            <Scripts />
+            </body>
+            </html>
+        )
 
-    return (
-        <div className="error-container">
-            <h1>Something went wrong</h1>
-            <pre>{error.message}</pre>
-        </div>
-    );
 }
 
-export default ErrorBoundary;
+export default ErrorBoundaryComponent;

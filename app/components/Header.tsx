@@ -4,7 +4,7 @@ import {WordPressMenuItem} from "~/types/wp-post-types.interface";
 
 const renderNavItems = (items, isChild = false) => (
     <ul className={`flex ${isChild ? 'flex-col ml-4' : 'space-x-4'}`}>
-        {items.map((item) => {
+        {items && items.length > 0 && items.map((item) => {
             const hasChildren = item.children && item.children.length > 0;
             return (
                 <li key={item.id}>

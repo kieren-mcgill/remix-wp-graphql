@@ -1,7 +1,5 @@
-import client from '~/lib/graphql-client';
 import { GET_PAGE } from '~/queries/page-query';
 import { WordPressPage } from "~/types/wp-post-types.interface";
-import process from "process";
 import createGraphQLClient from "~/lib/graphql-client";
 
 const getPage = async ({ params, homePageSlug, baseUrl }) : Promise<WordPressPage> => {
@@ -14,7 +12,7 @@ const getPage = async ({ params, homePageSlug, baseUrl }) : Promise<WordPressPag
 
         if (!page) {
             console.error('Page not found');
-            throw new Response('Not Found', { status: 404 });
+            throw new Response('Page not found', { status: 404 });
         }
 
         const pageRelPath = new URL(page.link).pathname;
@@ -38,7 +36,6 @@ const getPage = async ({ params, homePageSlug, baseUrl }) : Promise<WordPressPag
         return page;
     } catch (error) {
         console.error('Error fetching page:', error);
-        throw new Response('Failed to load data', { status: 500 });
     }
 };
 

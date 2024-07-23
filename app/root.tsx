@@ -3,7 +3,7 @@ import {
     Meta,
     Outlet,
     Scripts,
-    ScrollRestoration, useLoaderData,
+    ScrollRestoration, useLoaderData, useRouteError,
 } from "@remix-run/react";
 import "./styles/tailwind.css";
 import React from "react";
@@ -14,6 +14,7 @@ import ErrorBoundary from "~/components/ErrorBoundary";
 import getMenu from "~/lib/data/get-menu";
 import {WordPressMenu} from "~/types/wp-post-types.interface";
 import process from "process";
+import ErrorBoundaryComponent from "~/components/ErrorBoundary";
 
 export const loader = async () => {
     const navMenuName: string = process.env.NAV_MENU_NAME;
@@ -35,7 +36,9 @@ export const loader = async () => {
 
 export function Layout({ children }: { children: React.ReactNode }) {
 
-  const {navMenuItems, sitemapItems} = useLoaderData();
+    const data = useLoaderData();
+
+    const { navMenuItems = [], sitemapItems = [] } = data || {};
 
   return (
     <html lang="en">
@@ -69,9 +72,14 @@ export default function App() {
   return <Outlet />;
 }
 
-export const ErrorBoundary = () => {
-    return <ErrorBoundary />;
-};
+export function ErrorBoundary() {
+    const error = useRouteError();
+    console.error(error);
+    return (
+        <ErrorBoundaryComponent error={error}/>
+    );
+}
+
 
 
 

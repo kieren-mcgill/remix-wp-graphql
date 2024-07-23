@@ -1,20 +1,38 @@
-import { MetaFunction, useLoaderData } from "@remix-run/react";
+import {MetaFunction, useLoaderData, useRouteError} from "@remix-run/react";
 import createMeta from "~/lib/create-meta";
 import { WordPressPage } from "~/types/wp-post-types.interface";
 import getPage from "~/lib/data/get-page";
 import { Params } from "~/types/params.interface";
 import process from "process";
+import FourZeroFour from "~/components/FourZeroFour";
+import ErrorBoundaryComponent from "~/components/ErrorBoundary";
+import React from "react";
 
 export const loader = async ({ params }: { params: Params }) => {
     const homePageSlug = process.env.HOMEPAGE_SLUG;
     const baseUrl = process.env.WORDPRESS_API_URL;
+
     try {
-        return await getPage<WordPressPage | null>({ params, homePageSlug, baseUrl });
+        const page = await getPage<WordPressPage | null>({ params, homePageSlug, baseUrl });
+
+        if (!page) {
+            throw new Response('Page not found', { status: 404 });
+        }
+
+        return (page);
     } catch (error) {
         console.error('Error in page loader:', error);
-        throw new Response('Failed to load page data', { status: 500 });
+        throw error;
     }
 };
+
+export function ErrorBoundary() {
+    const error = useRouteError();
+    console.error(error);
+    return (
+        <h1>{error.status}</h1>
+    );
+}
 
 export const meta: MetaFunction = ({ data }) => {
     if (!data) {
@@ -32,5 +50,7 @@ const WPPageTemplate = () => {
         </div>
     );
 };
+
+
 
 export default WPPageTemplate;
