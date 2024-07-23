@@ -5,10 +5,11 @@ import WPPageTemplate, { meta } from "~/components/WPPageTemplate";
 
 export async function loader({ params }: { params: Params }) {
 
-    const homePageSlug = process.env.HOMEPAGE_SLUG
+    const homePageSlug = process.env.HOMEPAGE_SLUG;
+    const baseUrl = process.env.WORDPRESS_API_URL;
 
     try {
-        return await getPage({ params: { ...params, slug: homePageSlug }});
+        return await getPage({ params: { ...params, slug: homePageSlug }, homePageSlug, baseUrl});
     } catch (error) {
         console.error('Error in loader:', error);
         throw error;

@@ -17,10 +17,11 @@ import process from "process";
 export const loader = async () => {
     const navMenuName: string = process.env.NAV_MENU_NAME;
     const footerSitemapName: string = process.env.SITEMAP_NAME;
+    const baseUrl: string = process.env.WORDPRESS_API_URL;
 
     try {
-        const navMenu = await getMenu<WordPressMenu | null>(navMenuName);
-        const sitemap = await getMenu<WordPressMenu | null>(footerSitemapName);
+        const navMenu = await getMenu<WordPressMenu | null>(navMenuName, baseUrl);
+        const sitemap = await getMenu<WordPressMenu | null>(footerSitemapName, baseUrl);
 
         return {navMenuItems: navMenu.menuItems.nodes,
                 sitemapItems: sitemap.menuItems.nodes

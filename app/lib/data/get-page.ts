@@ -2,12 +2,13 @@ import client from '~/lib/graphql-client';
 import { GET_PAGE } from '~/queries/page-query';
 import { WordPressPage } from "~/types/wp-post-types.interface";
 import process from "process";
+import createGraphQLClient from "~/lib/graphql-client";
 
-const getPage = async ({ params }) : Promise<WordPressPage> => {
+const getPage = async ({ params, homePageSlug, baseUrl }) : Promise<WordPressPage> => {
     const { grandParentSlug, parentSlug, slug } = params;
-    const homePageSlug = process.env.HOMEPAGE_SLUG;
 
     try {
+        const client = createGraphQLClient(baseUrl)
         const data = await client.request(GET_PAGE, { id: slug });
         const page = data.page;
 

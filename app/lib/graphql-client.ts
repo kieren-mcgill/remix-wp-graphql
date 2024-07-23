@@ -1,11 +1,8 @@
 import { GraphQLClient } from 'graphql-request';
-import process from "process";
 
-const baseURL = process.env.WORDPRESS_API_URL
+const createGraphQLClient = (baseURL: string) => {
+    const endpoint = `${baseURL}/graphql`;
+    return new GraphQLClient(endpoint);
+};
 
-const endpoint =  `${baseURL}/graphql`
-
-const client = new GraphQLClient(endpoint, {
-});
-
-export default client;
+export default createGraphQLClient;
