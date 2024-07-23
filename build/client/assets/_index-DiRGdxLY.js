@@ -1,1 +1,0 @@
-import{j as e}from"./components-C_kpxqgJ.js";import{W as o}from"./WordPressPageTemplate-Bo9fKNpD.js";import{m as x}from"./WordPressPageTemplate-Bo9fKNpD.js";const m={},s=()=>e.jsx(o,{}),r=s;export{r as default,m as handle,x as meta};
