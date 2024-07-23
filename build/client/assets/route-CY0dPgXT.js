@@ -1,0 +1,1 @@
+import{j as a}from"./components--ykycIIQ.js";import{W as r}from"./WPPageTemplate-BrBcyhdi.js";import{E as m,m as u}from"./WPPageTemplate-BrBcyhdi.js";const t=()=>a.jsx(r,{}),n=t;export{m as ErrorBoundary,n as default,u as meta};

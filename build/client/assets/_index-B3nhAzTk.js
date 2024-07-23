@@ -1,0 +1,1 @@
+import{j as e}from"./components--ykycIIQ.js";import{W as o}from"./WPPageTemplate-BrBcyhdi.js";import{m as x}from"./WPPageTemplate-BrBcyhdi.js";const s={},t=()=>e.jsx(o,{}),r=t;export{r as default,s as handle,x as meta};

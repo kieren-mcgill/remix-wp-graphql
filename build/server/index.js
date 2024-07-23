@@ -1,7 +1,7 @@
 import { jsx, jsxs, Fragment } from "react/jsx-runtime";
 import { PassThrough } from "node:stream";
 import { createReadableStreamFromReadable } from "@remix-run/node";
-import { RemixServer, NavLink, useMatches, Outlet, useLoaderData, Meta, Links, ScrollRestoration, Scripts } from "@remix-run/react";
+import { RemixServer, NavLink, useMatches, Meta, Links, Scripts, Outlet, useLoaderData, ScrollRestoration, useRouteError } from "@remix-run/react";
 import { isbot } from "isbot";
 import { renderToPipeableStream } from "react-dom/server";
 import { GraphQLClient } from "graphql-request";
@@ -122,7 +122,7 @@ const flatListToHierarchical = (data = [], { idKey = "id", parentKey = "parentId
   });
   return tree;
 };
-const renderNavItems = (items, isChild = false) => /* @__PURE__ */ jsx("ul", { className: `flex ${isChild ? "flex-col ml-4" : "space-x-4"}`, children: items.map((item) => {
+const renderNavItems = (items, isChild = false) => /* @__PURE__ */ jsx("ul", { className: `flex ${isChild ? "flex-col ml-4" : "space-x-4"}`, children: items && items.length > 0 && items.map((item) => {
   const hasChildren = item.children && item.children.length > 0;
   return /* @__PURE__ */ jsxs("li", { children: [
     /* @__PURE__ */ jsx(NavLink, { to: item.uri, className: "hover:text-blue-500", children: item.label }),
@@ -206,6 +206,19 @@ const getMenu = async (menuName, baseUrl) => {
     throw new Error(`Failed to fetch menu: ${error.message}`);
   }
 };
+const ErrorBoundaryComponent = ({ error }) => {
+  return /* @__PURE__ */ jsxs("html", { children: [
+    /* @__PURE__ */ jsxs("head", { children: [
+      /* @__PURE__ */ jsx("title", { children: "Oh no!" }),
+      /* @__PURE__ */ jsx(Meta, {}),
+      /* @__PURE__ */ jsx(Links, {})
+    ] }),
+    /* @__PURE__ */ jsxs("body", { children: [
+      /* @__PURE__ */ jsx("h1", { children: error.status }),
+      /* @__PURE__ */ jsx(Scripts, {})
+    ] })
+  ] });
+};
 const loader$3 = async () => {
   const navMenuName = process$1.env.NAV_MENU_NAME;
   const footerSitemapName = process$1.env.SITEMAP_NAME;
@@ -223,7 +236,8 @@ const loader$3 = async () => {
   }
 };
 function Layout({ children }) {
-  const { navMenuItems, sitemapItems } = useLoaderData();
+  const data = useLoaderData();
+  const { navMenuItems = [], sitemapItems = [] } = data || {};
   return /* @__PURE__ */ jsxs("html", { lang: "en", children: [
     /* @__PURE__ */ jsxs("head", { children: [
       /* @__PURE__ */ jsx("meta", { charSet: "utf-8" }),
@@ -244,8 +258,14 @@ function Layout({ children }) {
 function App() {
   return /* @__PURE__ */ jsx(Outlet, {});
 }
+function ErrorBoundary$1() {
+  const error = useRouteError();
+  console.error(error);
+  return /* @__PURE__ */ jsx(ErrorBoundaryComponent, { error });
+}
 const route0 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
+  ErrorBoundary: ErrorBoundary$1,
   Layout,
   default: App,
   loader: loader$3
@@ -285,12 +305,12 @@ const GET_PAGE = `
 const getPage = async ({ params, homePageSlug, baseUrl }) => {
   const { grandParentSlug, parentSlug, slug } = params;
   try {
-    const client2 = createGraphQLClient(baseUrl);
-    const data = await client2.request(GET_PAGE, { id: slug });
+    const client = createGraphQLClient(baseUrl);
+    const data = await client.request(GET_PAGE, { id: slug });
     const page = data.page;
     if (!page) {
       console.error("Page not found");
-      throw new Response("Not Found", { status: 404 });
+      throw new Response("Page not found", { status: 404 });
     }
     const pageRelPath = new URL(page.link).pathname;
     let isCorrectPath;
@@ -310,19 +330,27 @@ const getPage = async ({ params, homePageSlug, baseUrl }) => {
     return page;
   } catch (error) {
     console.error("Error fetching page:", error);
-    throw new Response("Failed to load data", { status: 500 });
   }
 };
 const loader$2 = async ({ params }) => {
   const homePageSlug = process$1.env.HOMEPAGE_SLUG;
   const baseUrl = process$1.env.WORDPRESS_API_URL;
   try {
-    return await getPage({ params, homePageSlug, baseUrl });
+    const page = await getPage({ params, homePageSlug, baseUrl });
+    if (!page) {
+      throw new Response("Page not found", { status: 404 });
+    }
+    return page;
   } catch (error) {
     console.error("Error in page loader:", error);
-    throw new Response("Failed to load page data", { status: 500 });
+    throw error;
   }
 };
+function ErrorBoundary() {
+  const error = useRouteError();
+  console.error(error);
+  return /* @__PURE__ */ jsx("h1", { children: error.status });
+}
 const meta = ({ data }) => {
   if (!data) {
     return [];
@@ -336,6 +364,7 @@ const WPPageTemplate = () => {
 const GrandParentSlugParentSlugSlugPage = () => /* @__PURE__ */ jsx(WPPageTemplate, {});
 const route1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
+  ErrorBoundary,
   default: GrandParentSlugParentSlugSlugPage,
   loader: loader$2,
   meta
@@ -343,6 +372,7 @@ const route1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProper
 const ParentSlugSlugPage = () => /* @__PURE__ */ jsx(WPPageTemplate, {});
 const route2 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
+  ErrorBoundary,
   default: ParentSlugSlugPage,
   loader: loader$2,
   meta
@@ -391,11 +421,12 @@ const route5 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProper
 const SlugPage = () => /* @__PURE__ */ jsx(WPPageTemplate, {});
 const route6 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
+  ErrorBoundary,
   default: SlugPage,
   loader: loader$2,
   meta
 }, Symbol.toStringTag, { value: "Module" }));
-const serverManifest = { "entry": { "module": "/assets/entry.client-BU8uL3S5.js", "imports": ["/assets/components-XXrZDpAO.js"], "css": [] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/root-BAlOaCAr.js", "imports": ["/assets/components-XXrZDpAO.js"], "css": ["/assets/root-BBfxKysy.css"] }, "routes/$grandParentSlug.$parentSlug.$slug": { "id": "routes/$grandParentSlug.$parentSlug.$slug", "parentId": "root", "path": ":grandParentSlug/:parentSlug/:slug", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/route-J1dERLJy.js", "imports": ["/assets/components-XXrZDpAO.js", "/assets/WPPageTemplate-BC6dkPRH.js"], "css": [] }, "routes/$parentSlug.$slug": { "id": "routes/$parentSlug.$slug", "parentId": "root", "path": ":parentSlug/:slug", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/route-D-mEarSF.js", "imports": ["/assets/components-XXrZDpAO.js", "/assets/WPPageTemplate-BC6dkPRH.js"], "css": [] }, "routes/[robots.txt]": { "id": "routes/[robots.txt]", "parentId": "root", "path": "robots.txt", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/_robots.txt_-l0sNRNKZ.js", "imports": [], "css": [] }, "routes/post.$slug": { "id": "routes/post.$slug", "parentId": "root", "path": "post/:slug", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/route-l0sNRNKZ.js", "imports": [], "css": [] }, "routes/_index": { "id": "routes/_index", "parentId": "root", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/_index-CjERe5o5.js", "imports": ["/assets/components-XXrZDpAO.js", "/assets/WPPageTemplate-BC6dkPRH.js"], "css": [] }, "routes/$slug": { "id": "routes/$slug", "parentId": "root", "path": ":slug", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/route-ChXYLafx.js", "imports": ["/assets/components-XXrZDpAO.js", "/assets/WPPageTemplate-BC6dkPRH.js"], "css": [] } }, "url": "/assets/manifest-7bb7c4f1.js", "version": "7bb7c4f1" };
+const serverManifest = { "entry": { "module": "/assets/entry.client-DM7VrvJJ.js", "imports": ["/assets/components--ykycIIQ.js"], "css": [] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": true, "module": "/assets/root-DYFN8XQH.js", "imports": ["/assets/components--ykycIIQ.js"], "css": ["/assets/root-BBfxKysy.css"] }, "routes/$grandParentSlug.$parentSlug.$slug": { "id": "routes/$grandParentSlug.$parentSlug.$slug", "parentId": "root", "path": ":grandParentSlug/:parentSlug/:slug", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": true, "module": "/assets/route-CY0dPgXT.js", "imports": ["/assets/components--ykycIIQ.js", "/assets/WPPageTemplate-BrBcyhdi.js"], "css": [] }, "routes/$parentSlug.$slug": { "id": "routes/$parentSlug.$slug", "parentId": "root", "path": ":parentSlug/:slug", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": true, "module": "/assets/route-DT17a443.js", "imports": ["/assets/components--ykycIIQ.js", "/assets/WPPageTemplate-BrBcyhdi.js"], "css": [] }, "routes/[robots.txt]": { "id": "routes/[robots.txt]", "parentId": "root", "path": "robots.txt", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/_robots.txt_-l0sNRNKZ.js", "imports": [], "css": [] }, "routes/post.$slug": { "id": "routes/post.$slug", "parentId": "root", "path": "post/:slug", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/route-l0sNRNKZ.js", "imports": [], "css": [] }, "routes/_index": { "id": "routes/_index", "parentId": "root", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/_index-B3nhAzTk.js", "imports": ["/assets/components--ykycIIQ.js", "/assets/WPPageTemplate-BrBcyhdi.js"], "css": [] }, "routes/$slug": { "id": "routes/$slug", "parentId": "root", "path": ":slug", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": true, "module": "/assets/route-DIUzV8Kp.js", "imports": ["/assets/components--ykycIIQ.js", "/assets/WPPageTemplate-BrBcyhdi.js"], "css": [] } }, "url": "/assets/manifest-957cdc7c.js", "version": "957cdc7c" };
 const mode = "production";
 const assetsBuildDirectory = "build/client";
 const basename = "/";

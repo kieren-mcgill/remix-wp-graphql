@@ -1,1 +1,0 @@
-import{j as a}from"./components-XXrZDpAO.js";import{W as t}from"./WPPageTemplate-BC6dkPRH.js";import{m as s}from"./WPPageTemplate-BC6dkPRH.js";const e=()=>a.jsx(t,{}),g=e;export{g as default,s as meta};
