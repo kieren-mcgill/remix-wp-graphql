@@ -32,3 +32,22 @@ export interface WordPressPost {
         }>;
     };
 }
+
+export interface WordPressMenuItem {
+    id: string;
+    label: string;
+    uri: string;
+    parentId: string;
+}
+
+export interface WordPressMenu {
+    id: string;
+    name: string;
+    menuItems: {
+        nodes: WordPressMenuItem[];
+    };
+}
+
+export interface WordPressMenuResponse {
+    menu: WordPressMenu;
+}

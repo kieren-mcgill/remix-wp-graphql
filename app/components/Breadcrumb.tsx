@@ -14,7 +14,7 @@ const Breadcrumb = () => {
             {(breadcrumbs && showBreadcrumb) &&
             <nav className={"h-8 bg-amber-400"} aria-label="breadcrumb">
 
-                    <ol className={"flex gap-3"}>
+                    <ul className={"flex gap-3"}>
                         {breadcrumbs.map((breadcrumb, index: number) => {
 
                                 const itemURLObj = breadcrumb.url && new URL(breadcrumb.url)
@@ -31,7 +31,7 @@ const Breadcrumb = () => {
                                 )
                             }
                         )}
-                    </ol>
+                    </ul>
             </nav>
                 }
     </>

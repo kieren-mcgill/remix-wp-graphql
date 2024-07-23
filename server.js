@@ -21,7 +21,7 @@ app.use(
                 scriptSrc: ["'self'", "'unsafe-eval'", "'unsafe-inline'"],
                 styleSrc: ["'self'", "'unsafe-inline'"],
                 imgSrc: ["'self'", "data:", "https:"],
-                connectSrc: ["'self'", "https:", "ws://localhost:24678/"],
+                connectSrc: ["'self'", "https:"],
                 objectSrc: ["'none'"],
                 upgradeInsecureRequests: [],
             },

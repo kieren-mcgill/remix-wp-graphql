@@ -1,9 +1,9 @@
 import client from '~/lib/graphql-client';
 import { GET_PAGE } from '~/queries/page-query';
-import { WordPressPage } from "~/types/wordpress.interface";
+import { WordPressPage } from "~/types/wp-post-types.interface";
 import process from "process";
 
-const fetchPage = async ({ params }) : Promise<WordPressPage> => {
+const getPage = async ({ params }) : Promise<WordPressPage> => {
     const { grandParentSlug, parentSlug, slug } = params;
     const homePageSlug = process.env.HOMEPAGE_SLUG;
 
@@ -41,5 +41,5 @@ const fetchPage = async ({ params }) : Promise<WordPressPage> => {
     }
 };
 
-export default fetchPage;
+export default getPage;
 

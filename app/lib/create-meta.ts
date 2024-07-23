@@ -1,4 +1,4 @@
-import SeoData from "~/types/yoast.interface";
+import SeoData from "~/types/seo.interface";
 
 const createMeta = (seoData: SeoData | null) => {
 

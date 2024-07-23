@@ -1,14 +1,14 @@
-import {Params} from "~/types/remix.interface";
-import fetchPage from "~/lib/data/fetch-page";
+import {Params} from "~/types/params.interface";
+import getPage from "~/lib/data/get-page";
 import process from "process";
-import WordPressPageTemplate, { meta } from "~/components/WordPressPageTemplate";
+import WPPageTemplate, { meta } from "~/components/WPPageTemplate";
 
 export async function loader({ params }: { params: Params }) {
 
     const homePageSlug = process.env.HOMEPAGE_SLUG
 
     try {
-        return await fetchPage({ params: { ...params, slug: homePageSlug }});
+        return await getPage({ params: { ...params, slug: homePageSlug }});
     } catch (error) {
         console.error('Error in loader:', error);
         throw error;
@@ -19,7 +19,7 @@ export const handle = {};
 
 export { meta }
 
-const HomePage = () => <WordPressPageTemplate />;
+const HomePage = () => <WPPageTemplate />;
 
 export default HomePage;
 

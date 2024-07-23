@@ -1,15 +1,15 @@
 import { MetaFunction, useLoaderData } from "@remix-run/react";
 import createMeta from "~/lib/create-meta";
-import { WordPressPage } from "~/types/wordpress.interface";
-import fetchPage from "~/lib/data/fetch-page";
-import { Params } from "~/types/remix.interface";
+import { WordPressPage } from "~/types/wp-post-types.interface";
+import getPage from "~/lib/data/get-page";
+import { Params } from "~/types/params.interface";
 
 export const loader = async ({ params }: { params: Params }) => {
     try {
-        return await fetchPage<WordPressPage | null>({ params });
+        return await getPage<WordPressPage | null>({ params });
     } catch (error) {
-        console.error('Error in loader:', error);
-        throw error;
+        console.error('Error in page loader:', error);
+        throw new Response('Failed to load page data', { status: 500 });
     }
 };
 
@@ -20,7 +20,7 @@ export const meta: MetaFunction = ({ data }) => {
     return createMeta(data.seo);
 };
 
-const WordPressPageTemplate = () => {
+const WPPageTemplate = () => {
     const page = useLoaderData<WordPressPage>();
 
     return (
@@ -30,4 +30,4 @@ const WordPressPageTemplate = () => {
     );
 };
 
-export default WordPressPageTemplate;
+export default WPPageTemplate;

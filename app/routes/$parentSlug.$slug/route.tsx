@@ -1,6 +1,6 @@
-import WordPressPageTemplate, { loader, meta } from "~/components/WordPressPageTemplate";
+import WPPageTemplate, { loader, meta } from "~/components/WPPageTemplate";
 
 export { loader, meta };
 
-const ParentSlugSlugPage = () => <WordPressPageTemplate />;
+const ParentSlugSlugPage = () => <WPPageTemplate />;
 export default ParentSlugSlugPage;
