@@ -4,8 +4,6 @@ import { WordPressPage } from "~/types/wp-post-types.interface";
 import getPage from "~/lib/data/get-page";
 import { Params } from "~/types/params.interface";
 import process from "process";
-import FourZeroFour from "~/components/FourZeroFour";
-import ErrorBoundaryComponent from "~/components/ErrorBoundary";
 import React from "react";
 
 export const loader = async ({ params }: { params: Params }) => {
@@ -50,7 +48,5 @@ const WPPageTemplate = () => {
         </div>
     );
 };
-
-
 
 export default WPPageTemplate;

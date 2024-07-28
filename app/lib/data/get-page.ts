@@ -12,7 +12,6 @@ const getPage = async ({ params, homePageSlug, baseUrl }) : Promise<WordPressPag
 
         if (!page) {
             console.error('Page not found');
-            throw new Response('Page not found', { status: 404 });
         }
 
         const pageRelPath = new URL(page.link).pathname;
@@ -30,7 +29,6 @@ const getPage = async ({ params, homePageSlug, baseUrl }) : Promise<WordPressPag
 
         if (!isCorrectPath) {
             console.error('Found page does not match the expected path:');
-            throw new Response('Found page does not match path', { status: 404 });
         }
 
         return page;

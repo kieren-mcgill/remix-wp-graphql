@@ -10,8 +10,10 @@ export async function loader({ params }: { params: Params }) {
 
     try {
         return await getPage({ params: { ...params, slug: homePageSlug }, homePageSlug, baseUrl});
+
+
     } catch (error) {
-        console.error('Error in loader:', error);
+        console.error('Error in home page loader:', error);
         throw error;
     }
 }
